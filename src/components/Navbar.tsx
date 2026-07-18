@@ -19,17 +19,27 @@ function Navbar() {
 
     return (
         <nav className="shadow p-4">
-          <Container>
-              {navLinks.map((item) => (
-                <Link 
-                    key={item.href}  
-                    href={item.href} 
-                    className={`mr-4 ${pathName === item.href ? "text-sky-300" : ""}`}
-                >
-                    {item.title}
-                </Link>
-            ))}
-          </Container>
+            <Container>
+                <div className="flex justify-start items-center">
+
+
+                    {navLinks.map((item) => (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className={`mr-4 ${pathName === item.href ? "text-sky-300" : ""}`}
+                        >
+                            {item.title}
+                        </Link>
+                    ))}
+
+
+                </div>
+                <div className="flex justify-end"><Link href="/cart">
+
+                    <span>سبد خرید</span></Link>
+                </div>
+            </Container>
         </nav>
     );
 }
