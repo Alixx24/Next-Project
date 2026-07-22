@@ -1,14 +1,30 @@
 "use client"
 import { useShoppingCartContext } from "@/context/ShoppingCartContext";
 
-function AddToCart() {
-    const { cartItems, setCartItems } = useShoppingCartContext();
+interface IAddToCartProps {
+    id: string;
+}
+
+function AddToCart({ id }: IAddToCartProps) {
+    const { handleIncreaseProductQty, handleDecreaseProductQty, getProductQty } = useShoppingCartContext();
+    const productId = parseInt(id);
+    const qty = getProductQty(productId);
     
     return (
         <div className="mt-2">
-            <button className="py-2 px-4 rounded bg-sky-500 text-white">+</button>
-            <span className="mx-4">3</span>
-            <button className="py-2 px-4 rounded bg-sky-500 text-white">-</button>
+            <button 
+                onClick={() => handleIncreaseProductQty(productId)} 
+                className="py-2 px-4 rounded bg-sky-500 text-white"
+            >
+                +
+            </button>
+            <span className="mx-4">{qty}</span>
+            <button 
+                onClick={() => handleDecreaseProductQty(productId)}
+                className="py-2 px-4 rounded bg-sky-500 text-white"
+            >
+                -
+            </button>
         </div>
     )
 }

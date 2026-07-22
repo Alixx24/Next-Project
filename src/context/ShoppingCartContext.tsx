@@ -12,7 +12,9 @@ type CartItem = {
 
 type ShoppingCartContextType = {
     cartItems: CartItem[];
-    setCartItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
+    handleIncreaseProductQty: (id: number) => void;
+    handleDecreaseProductQty: (id: number) => void;
+    getProductQty: (id: number) => number;
 };
 
 const ShoppingCartContext = createContext<ShoppingCartContextType | undefined>(
@@ -24,8 +26,52 @@ export function ShoppingCartContextProvider({
 }: ShoppingCartContextProviderProps) {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     
+    const handleIncreaseProductQty = (id: number) => {
+        setCartItems(prevItems => {
+            const existingItem = prevItems.find(item => item.id === id);
+            
+            if (!existingItem) {
+                return [...prevItems, { id, qty: 1 }];
+            }
+            
+            return prevItems.map(item => 
+                item.id === id 
+                    ? { ...item, qty: item.qty + 1 }
+                    : item
+            );
+        });
+    };
+
+    const handleDecreaseProductQty = (id: number) => {
+        setCartItems(prevItems => {
+            const existingItem = prevItems.find(item => item.id === id);
+            
+            if (!existingItem) return prevItems;
+            
+            if (existingItem.qty === 1) {
+                return prevItems.filter(item => item.id !== id);
+            }
+            
+            return prevItems.map(item => 
+                item.id === id 
+                    ? { ...item, qty: item.qty - 1 }
+                    : item
+            );
+        });
+    };
+
+    const getProductQty = (id: number) => {
+        const item = cartItems.find(item => item.id === id);
+        return item?.qty || 0;
+    };
+
     return (
-        <ShoppingCartContext.Provider value={{ cartItems, setCartItems }}>
+        <ShoppingCartContext.Provider value={{ 
+            cartItems, 
+            handleIncreaseProductQty,
+            handleDecreaseProductQty,
+            getProductQty
+        }}>
             {children}
         </ShoppingCartContext.Provider>
     );
