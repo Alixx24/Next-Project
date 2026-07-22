@@ -1,3 +1,4 @@
+import AddToCart from "@/components/AddToCart";
 import Container from "@/components/Container";
 
 function Store() {
@@ -9,11 +10,7 @@ function Store() {
                     <span>desc Lorem ipsum dolor sit amet consectetur adipisicing elit. Fuga perferendis nisi autem voluptatibus earum, iste voluptates iusto minus accusantium quibusdam accusamus eos repellendus obcaecati molestias ipsam alias. Totam, blanditiis consectetur.</span>
                     <p>price: <span>20$</span></p>
 
-                    <div className="mt-2">
-                        <button className="py-2 px-4 rounded bg-sky-500 text-white">+</button>
-                        <span className="mx-4">3</span>
-                        <button className="py-2 px-4 rounded bg-sky-500 text-white">-</button>
-                    </div>
+             <AddToCart />
                 </div>
                 <div className="col-span-3 p-4">
                     <img 

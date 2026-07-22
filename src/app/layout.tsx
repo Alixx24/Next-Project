@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Layout from "@/components/Layout";
+import { ShoppingCartContextProvider } from "@/context/ShoppingCartContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,12 +26,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-
-    >
-      <Navbar />
-      <body className="min-h-full flex flex-col"><Layout>{children}</Layout></body>
+    <html lang="en">
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <Navbar />
+        <ShoppingCartContextProvider> 
+          <Layout>{children}</Layout>
+        </ShoppingCartContextProvider>
+      </body>
     </html>
   );
 }
