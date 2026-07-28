@@ -15,6 +15,10 @@ function Navbar() {
             href: "/store",
             title: "Store",
         },
+        {
+            href: "/dashboard",
+            title: "Dashboard",
+        },
     ];
 
     return (

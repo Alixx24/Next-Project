@@ -1,31 +1,26 @@
-import Link from "next/link";
+// 📁 src/components/ProductItem.tsx
+import Image from 'next/image';
 
-interface IProductItemProps{
-    id: string,
-    image: string,
-    title: string,
-    description: string,
-    price: number
+interface ProductItemProps {
+  id: number;
+  title: string;
+  price: number;
+  image: string;
 }
 
-function ProductItem({ id, image, title, description, price }: IProductItemProps) {
-    return (
-        <div className='shadow-md hover:shadow-lg transition-shadow duration-300 rounded-lg overflow-hidden'>
-            <Link href={`/product/${id}`}>
-                <img 
-                    src={image} 
-                    alt={title}
-                    className="w-full h-48 object-cover"
-                />
-                <div className='p-4'>
-                    <h2 className='font-bold text-lg truncate'>{title}</h2>
-                    <p className="text-gray-600 text-sm line-clamp-2">{description}</p>
-                    <p className='mt-2 font-semibold text-blue-600'>
-                        price: <span>{price} $</span>
-                    </p>
-                </div>
-            </Link>
-        </div>
-    )
+export default function ProductItem({ id, title, price, image }: ProductItemProps) {
+  return (
+    <div className='shadow-md hover:shadow-lg transition-shadow duration-300 rounded-lg overflow-hidden'>
+      {/* لینک رو حذف کردیم، فقط محتوا */}
+      <img 
+        src={image} 
+        alt={title}
+        className="w-full h-48 object-cover"
+      />
+      <div className="p-4">
+        <h3 className="font-bold text-lg">{title}</h3>
+        <p className="text-gray-600">{price}$</p>
+      </div>
+    </div>
+  );
 }
-export default ProductItem

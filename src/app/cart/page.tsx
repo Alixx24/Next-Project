@@ -1,28 +1,30 @@
-import CartItem from "@/components/CartItem"
-import Container from "@/components/Container"
+// 📁 src/app/cart/page.tsx
+import { ShoppingCartContextProvider } from "@/context/ShoppingCartContext";
+import CartList from "@/components/CartItem";
+import CartSummary from "@/components/CartSummary.tsx";
 
-function Cart() {
-    return (
-        <Container>
-            <div className="grid grid-cols-3 gap-4">
-                {/* لیست آیتم‌های سبد خرید */}
-                <div className="col-span-2">
-                    <CartItem key={1} />
-                    <CartItem key={2} />
-                    <CartItem key={3} />
-                </div>
-                
-                <div className="col-span-1 border shadow-md text-right p-4 rounded-lg h-fit sticky top-4">
-                    <h3 className="font-bold text-lg mb-2">summary</h3>
-                    <p>amount: 3</p>
-                    <p> total: 60$</p>
-                    <button className="w-full mt-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
-                       Submit Order
-                    </button>
-                </div>
-            </div>
-        </Container>
-    )
+// این تابع در سرور اجرا میشه (میتونه از دیتابیس بیاد)
+async function getProducts() {
+  // در اینجا میتونی از دیتابیس یا API بخونی
+  return [
+    { id: 1, title: "محصول ۱", price: 20 },
+    { id: 2, title: "محصول ۲", price: 30 },
+  ];
 }
 
-export default Cart;
+export default async function CartPage() {
+  const products = await getProducts(); // اطلاعات در سرور دریافت میشه
+  
+  return (
+    <ShoppingCartContextProvider>
+      <div className="grid grid-cols-3 gap-4">
+        <div className="col-span-2">
+          <CartList products={products} /> {/* اطلاعات به کلاینت پاس داده میشه */}
+        </div>
+        <div className="col-span-1">
+          <CartSummary />
+        </div>
+      </div>
+    </ShoppingCartContextProvider>
+  );
+}

@@ -11,6 +11,7 @@ function AddToCart({ id }: IAddToCartProps) {
     const qty = getProductQty(productId);
     
     return (
+        <div>
         <div className="mt-2">
             <button 
                 onClick={() => handleIncreaseProductQty(productId)} 
@@ -26,6 +27,10 @@ function AddToCart({ id }: IAddToCartProps) {
                 -
             </button>
         </div>
+        <button className="bg-red-500 text-white rounded">
+Delete
+        </button>
+         </div>
     )
 }
 export default AddToCart;

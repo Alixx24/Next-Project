@@ -15,6 +15,7 @@ type ShoppingCartContextType = {
     handleIncreaseProductQty: (id: number) => void;
     handleDecreaseProductQty: (id: number) => void;
     getProductQty: (id: number) => number;
+    handleRemoveProduct: (id: number) => void;
 };
 
 const ShoppingCartContext = createContext<ShoppingCartContextType | undefined>(
@@ -65,12 +66,19 @@ export function ShoppingCartContextProvider({
         return item?.qty || 0;
     };
 
+    const handleRemoveProduct = (id: number)=>{
+        setCartItems(currentItems=>{
+            return currentItems.filter(item=>item.id !== id)
+        })
+    }
+
     return (
         <ShoppingCartContext.Provider value={{ 
             cartItems, 
             handleIncreaseProductQty,
             handleDecreaseProductQty,
-            getProductQty
+            getProductQty,
+            handleRemoveProduct
         }}>
             {children}
         </ShoppingCartContext.Provider>
