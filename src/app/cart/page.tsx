@@ -1,25 +1,33 @@
-// 📁 src/app/cart/page.tsx
+// src/app/cart/page.tsx
 import { ShoppingCartContextProvider } from "@/context/ShoppingCartContext";
-import CartList from "@/components/CartItem";
-import CartSummary from "@/components/CartSummary.tsx";
+import CartList from "@/components/CartList";
+import CartSummary from "@/components/CartSummary";
+import { ProductRepositoryFactory } from "@/infrastructure/repositories/ProductRepositoryFactory";
+import { GetProductsUseCase } from "@/core/use-cases/GetProductsUseCase";
+import { Product } from "@/core/entities/Product";
 
-// این تابع در سرور اجرا میشه (میتونه از دیتابیس بیاد)
-async function getProducts() {
-  // در اینجا میتونی از دیتابیس یا API بخونی
-  return [
-    { id: 1, title: "محصول ۱", price: 20 },
-    { id: 2, title: "محصول ۲", price: 30 },
-  ];
+// تابع کمکی برای دریافت دیتا در سرور
+async function fetchProducts(): Promise<Product[]> {
+  try {
+    const repository = ProductRepositoryFactory.create();
+    const useCase = new GetProductsUseCase(repository);
+    const result = await useCase.execute();
+    return Array.isArray(result) ? result : [];
+  } catch (error) {
+    console.error('Failed to fetch products:', error);
+    return [];
+  }
 }
 
+// ✅ این قسمت مهم است - کامپوننت اصلی با export default
 export default async function CartPage() {
-  const products = await getProducts(); // اطلاعات در سرور دریافت میشه
+  const products = await fetchProducts();
   
   return (
     <ShoppingCartContextProvider>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-4 p-4">
         <div className="col-span-2">
-          <CartList products={products} /> {/* اطلاعات به کلاینت پاس داده میشه */}
+          <CartList products={products} />
         </div>
         <div className="col-span-1">
           <CartSummary />

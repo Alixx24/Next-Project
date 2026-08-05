@@ -1,50 +1,54 @@
-import AddToCart from "@/components/AddToCart";
-import Container from "@/components/Container";
-import { Suspense } from "react";
+// 📁 src/app/store/[id]/page.tsx
+import { ProductRepositoryFactory } from '@/infrastructure/repositories/ProductRepositoryFactory';
+import { GetProductsUseCase } from '@/core/use-cases/GetProductsUseCase';
+import { Product } from '@/core/entities/Product';
+import ProductDetail from './ProductDetail';
+import { notFound } from 'next/navigation';
 
-interface IProductItemPage {
-    id: number;
-    title: string;
-    description: string;
-    price: number;
-    image: string;
-}
-
-async function getProduct(id: string) {
-    const res = await fetch(`http://localhost:8000/product/${id}`);
-    if (!res.ok) throw new Error('Failed to fetch product');
-    return res.json();
-}
-
-interface ProductProps {
-    params: { id: string };
-}
-
-async function Product({ params }: ProductProps) {
-    const data: IProductItemPage = await getProduct(params.id);
+// ✅ دریافت محصول با استفاده از ریپازیتوری
+async function getProduct(id: string): Promise<Product | null> {
+  try {
+    console.log(`🔍 جستجوی محصول با id: ${id}`);
     
-    return (
-        <Container>
-            <div className="grid grid-cols-12">
-                <div className="col-span-9 p-4">
-                    <h2 className="font-bold text-2xl">{data.title}</h2>
-                    <span>{data.description}</span>
-                    <p>price: <span>{data.price}$</span></p>
-                    <AddToCart id={params.id} />
-                </div>
-                <div className="col-span-3 p-4">
-                    <img 
-                        src={data.image || "https://via.placeholder.com/300"} 
-                        alt="product image"
-                        className="w-full h-auto rounded"
-                    />
-                </div>
-                <div className="col-span-12 bg-slate-300 h-12">
-                    {/* سایر محتوا */}
-                </div>
-            </div>
-        </Container>
-    )
+    const repository = ProductRepositoryFactory.create();
+    const useCase = new GetProductsUseCase(repository);
+    const products = await useCase.execute();
+    
+    const product = products.find(p => p.id === Number(id));
+    
+    if (!product) {
+      console.warn(`⚠️ محصول با id ${id} یافت نشد`);
+      return null;
+    }
+    
+    return product;
+  } catch (error) {
+    console.error('❌ خطا در دریافت محصول:', error);
+    return null;
+  }
 }
 
-export default Product;
+// ✅ راه‌حل اصلی: استفاده از await برای params
+export default async function ProductPage({ 
+  params 
+}: { 
+  params: Promise<{ id: string }>  // ✅ توجه: params یک Promise است
+}) {
+  // ✅ باید از await استفاده کنیم
+  const { id } = await params;
+  
+  console.log(`📄 دریافت صفحه محصول با id: ${id}`);
+  
+  if (!id) {
+    console.error('❌ id در params وجود ندارد');
+    notFound();
+  }
+  
+  const product = await getProduct(id);
+  
+  if (!product) {
+    notFound();
+  }
+
+  return <ProductDetail product={product} />;
+}
