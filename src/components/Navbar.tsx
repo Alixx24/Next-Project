@@ -19,6 +19,10 @@ function Navbar() {
             href: "/dashboard",
             title: "Dashboard",
         },
+          {
+            href: "/user",
+            title: "Users",
+        },
     ];
 
     return (

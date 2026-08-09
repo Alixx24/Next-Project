@@ -37,5 +37,20 @@ export class LaravelApiClient {
     return { data: response.data };
   }
 
-  // متدهای put, delete, patch...
+   // اضافه کنید به کلاس LaravelApiClient
+
+async delete<T>(url: string, config?: AxiosRequestConfig): Promise<{ data: T }> {
+  const response = await this.client.delete<T>(url, config);
+  return { data: response.data };
+}
+
+async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<{ data: T }> {
+  const response = await this.client.put<T>(url, data, config);
+  return { data: response.data };
+}
+
+async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<{ data: T }> {
+  const response = await this.client.patch<T>(url, data, config);
+  return { data: response.data };
+}
 }
