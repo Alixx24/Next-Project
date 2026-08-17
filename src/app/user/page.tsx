@@ -1,44 +1,112 @@
-// 📁 src/app/user/page.tsx
-'use client';  // ✅ اضافه کردن این خط
+'use client';
 
 import Container from '@/components/Container';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import UserList from '@/components/UserList';
 import { User } from '@/core/entities/User';
-import { useState, useEffect } from 'react';
-import { UserRepositoryFactory } from '@/infrastructure/repositories/UserRepositoryFactory';
-// ✅ اصلاح: حذف آکولاد برای import پیش‌فرض
 import GetUsersUseCase from '@/core/use-cases/GetUsersUseCase';
+import DeleteUserUseCase from '@/core/use-cases/DeleteUserUseCase';
+import { UserRepositoryFactory } from '@/infrastructure/repositories/UserRepositoryFactory';
+import { useEffect, useState } from 'react';
+
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingUserId, setDeletingUserId] = useState<number | null>(null);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  // دریافت کاربران در سمت کلاینت
   useEffect(() => {
-    async function fetchUsers() {
+    let isMounted = true;
+
+    async function loadUsers() {
+      setLoading(true);
+
       try {
         const repository = UserRepositoryFactory.create();
         const useCase = new GetUsersUseCase(repository);
         const result = await useCase.execute();
-        setUsers(result.success ? (result.data || []) : []);
+
+        if (isMounted) {
+          setUsers(result.success ? result.data || [] : []);
+        }
       } catch (error) {
         console.error('❌ خطا در دریافت کاربران:', error);
-        setUsers([]);
+
+        if (isMounted) {
+          setUsers([]);
+          setFeedback({
+            type: 'error',
+            message: 'دریافت لیست کاربران با خطا مواجه شد',
+          });
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
-    fetchUsers();
+
+    loadUsers();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // ✅ Event handlerها در کلاینت تعریف می‌شوند
+  useEffect(() => {
+    if (!feedback) return;
+
+    const timer = setTimeout(() => setFeedback(null), 4000);
+    return () => clearTimeout(timer);
+  }, [feedback]);
+
   const handleEdit = (user: User) => {
     console.log('✏️ ویرایش کاربر:', user);
-    // منطق ویرایش
   };
 
-  const handleDelete = (user: User) => {
-    console.log('🗑️ حذف کاربر:', user);
-    // منطق حذف
+  const handleDeleteRequest = (user: User) => {
+    setUserToDelete(user);
+  };
+
+  const handleDeleteCancel = () => {
+    if (deletingUserId !== null) return;
+    setUserToDelete(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!userToDelete) return;
+
+    setDeletingUserId(userToDelete.id);
+
+    try {
+      const repository = UserRepositoryFactory.create();
+      const useCase = new DeleteUserUseCase(repository);
+      const result = await useCase.execute(userToDelete.id);
+
+      if (!result.success) {
+        setFeedback({
+          type: 'error',
+          message: result.error || 'حذف کاربر انجام نشد',
+        });
+        return;
+      }
+
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userToDelete.id));
+      setFeedback({
+        type: 'success',
+        message: `کاربر «${userToDelete.name}» با موفقیت حذف شد`,
+      });
+      setUserToDelete(null);
+    } catch (error) {
+      console.error('❌ خطا در حذف کاربر:', error);
+      setFeedback({
+        type: 'error',
+        message: 'حذف کاربر با خطا مواجه شد',
+      });
+    } finally {
+      setDeletingUserId(null);
+    }
   };
 
   if (loading) {
@@ -57,12 +125,40 @@ export default function UsersPage() {
           {users.length} کاربر
         </span>
       </div>
-      <UserList 
-        users={users} 
-        viewMode="grid" 
-        showActions={true}
-        onEdit={handleEdit}     // ✅ حالا درست کار می‌کند
-        onDelete={handleDelete} // ✅ حالا درست کار می‌کند
+
+      {feedback && (
+        <div
+          className={`mb-4 rounded-xl px-4 py-3 text-sm ${
+            feedback.type === 'success'
+              ? 'bg-green-50 text-green-700 border border-green-200'
+              : 'bg-red-50 text-red-700 border border-red-200'
+          }`}
+        >
+          {feedback.message}
+        </div>
+      )}
+
+      <UserList
+        users={users}
+        viewMode="grid"
+        showActions
+        onEdit={handleEdit}
+        onDelete={handleDeleteRequest}
+        deletingUserId={deletingUserId}
+      />
+
+      <ConfirmDialog
+        isOpen={userToDelete !== null}
+        title="حذف کاربر"
+        message={
+          userToDelete
+            ? `آیا از حذف کاربر «${userToDelete.name}» مطمئن هستید؟ این عملیات قابل بازگشت نیست.`
+            : ''
+        }
+        confirmLabel="حذف"
+        isLoading={deletingUserId !== null}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
       />
     </Container>
   );
