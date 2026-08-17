@@ -95,7 +95,10 @@ export default function UsersPage() {
       setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userToDelete.id));
       setFeedback({
         type: 'success',
-        message: `کاربر «${userToDelete.name}» با موفقیت حذف شد`,
+        message:
+          result.method === 'soft'
+            ? `کاربر «${userToDelete.name}» غیرفعال شد (سرور فقط soft delete را پشتیبانی می‌کند)`
+            : `کاربر «${userToDelete.name}» با موفقیت حذف شد`,
       });
       setUserToDelete(null);
     } catch (error) {
