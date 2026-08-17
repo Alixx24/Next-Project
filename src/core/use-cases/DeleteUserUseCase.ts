@@ -2,10 +2,7 @@ import { IUserRepository } from '@/core/interfaces/IUserRepository';
 
 export type DeleteUserResult = {
   success: boolean;
-<<<<<<< HEAD
-=======
   method?: 'hard' | 'soft';
->>>>>>> fcf1628f68910c25f52d3660028eb3badd2e881c
   error?: string;
 };
 
@@ -39,14 +36,17 @@ export default class DeleteUserUseCase {
 
       const deleted = await this.userRepository.delete(id);
 
-      if (!deleted) {
+      if (!deleted.success) {
         return {
           success: false,
-          error: 'حذف کاربر با خطا مواجه شد',
+          error: deleted.error || 'حذف کاربر با خطا مواجه شد',
         };
       }
 
-      return { success: true };
+      return {
+        success: true,
+        method: deleted.method,
+      };
     } catch (error) {
       console.error(`❌ خطا در DeleteUserUseCase برای کاربر ${id}:`, error);
       return {
