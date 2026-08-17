@@ -8,6 +8,7 @@ import { FaUser, FaEnvelope, FaPhone, FaUserTag, FaCircle } from 'react-icons/fa
 interface UserCardProps {
   user: User;
   showActions?: boolean;
+  isDeleting?: boolean;
   onEdit?: (user: User) => void;
   onDelete?: (user: User) => void;
 }

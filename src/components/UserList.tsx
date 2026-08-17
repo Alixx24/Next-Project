@@ -9,6 +9,7 @@ interface UserListProps {
   users: User[];
   viewMode?: 'grid' | 'list';
   showActions?: boolean;
+  deletingUserId?: number | null;
   onEdit?: (user: User) => void;
   onDelete?: (user: User) => void;
 }
@@ -17,6 +18,7 @@ export default function UserList({
   users, 
   viewMode = 'grid',
   showActions = false,
+  deletingUserId = null,
   onEdit,
   onDelete 
 }: UserListProps) {
@@ -64,6 +66,7 @@ export default function UserList({
               key={user.id} 
               user={user} 
               showActions={showActions}
+              isDeleting={deletingUserId === user.id}
               onEdit={onEdit}
               onDelete={onDelete}
             />
@@ -72,7 +75,14 @@ export default function UserList({
       ) : (
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden divide-y divide-gray-100">
           {users.map((user) => (
-            <UserItem key={user.id} user={user} />
+            <UserItem
+              key={user.id}
+              user={user}
+              showActions={showActions}
+              isDeleting={deletingUserId === user.id}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
           ))}
         </div>
       )}
