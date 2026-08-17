@@ -28,6 +28,7 @@ const roleLabels = {
 export default function UserCard({ 
   user, 
   showActions = false,
+  isDeleting = false,
   onEdit,
   onDelete 
 }: UserCardProps) {
@@ -102,16 +103,20 @@ export default function UserCard({
         {showActions && (
           <div className="mt-4 flex gap-2 pt-3 border-t border-gray-200">
             <button
+              type="button"
               onClick={() => onEdit?.(user)}
-              className="flex-1 bg-blue-500 text-white px-3 py-1.5 rounded-lg hover:bg-blue-600 transition-colors text-sm"
+              disabled={isDeleting}
+              className="flex-1 bg-blue-500 text-white px-3 py-1.5 rounded-lg hover:bg-blue-600 transition-colors text-sm disabled:cursor-not-allowed disabled:opacity-50"
             >
               ویرایش
             </button>
             <button
+              type="button"
               onClick={() => onDelete?.(user)}
-              className="flex-1 bg-red-500 text-white px-3 py-1.5 rounded-lg hover:bg-red-600 transition-colors text-sm"
+              disabled={isDeleting}
+              className="flex-1 bg-red-500 text-white px-3 py-1.5 rounded-lg hover:bg-red-600 transition-colors text-sm disabled:cursor-not-allowed disabled:opacity-50"
             >
-              حذف
+              {isDeleting ? 'در حال حذف...' : 'حذف'}
             </button>
           </div>
         )}

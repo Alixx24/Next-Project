@@ -1,5 +1,5 @@
 // 📁 src/infrastructure/repositories/UserRepository.ts
-import { IUserRepository } from '@/core/interfaces/IUserRepository';
+import { IUserRepository, DeleteUserRepositoryResult } from '@/core/interfaces/IUserRepository';
 import { User, CreateUserDTO, UpdateUserDTO } from '@/core/entities/User';
 import { LaravelApiClient } from '@/infrastructure/api/laravel-api';
 
@@ -73,13 +73,35 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-  async delete(id: number): Promise<boolean> {
+  async delete(id: number): Promise<DeleteUserRepositoryResult> {
     try {
-      await this.apiClient.delete(`/users/${id}`);
-      return true;
+      const response = await fetch(`/api/users/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: data.error || 'حذف کاربر با خطا مواجه شد',
+          statusCode: data.statusCode ?? response.status,
+        };
+      }
+
+      return {
+        success: true,
+        method: data.method,
+      };
     } catch (error) {
       console.error(`❌ خطا در حذف کاربر ${id}:`, error);
-      return false;
+      return {
+        success: false,
+        error: 'اتصال به سرور برقرار نشد',
+      };
     }
   }
 

@@ -2,6 +2,10 @@ import { IUserRepository } from '@/core/interfaces/IUserRepository';
 
 export type DeleteUserResult = {
   success: boolean;
+<<<<<<< HEAD
+=======
+  method?: 'hard' | 'soft';
+>>>>>>> fcf1628f68910c25f52d3660028eb3badd2e881c
   error?: string;
 };
 
